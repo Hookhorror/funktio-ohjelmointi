@@ -39,12 +39,12 @@ simulateWorld :: Float -> (AsteroidWorld -> AsteroidWorld)
 
 simulateWorld _        GameOver          = GameOver  
 
-simulateWorld timeStep (Play rocks (Ship shipPos shipV) bullets (Ufo ufoPos ufoV))
+simulateWorld timeStep (Play rocks (Ship shipPos shipV) bullets (Ufo ufoPos ufoV)) -- Ufo lisätty
   | any (collidesWith shipPos) rocks = GameOver
   | otherwise = Play (concatMap updateRock rocks) 
                               (Ship newShipPos shipV)
                               (concat (map updateBullet bullets))
-                              (Ufo updateUfo ufoV)
+                              (Ufo updateUfo ufoV) -- Ufo lisätty
   where
       collidesWith :: PointInSpace -> Rock -> Bool
       collidesWith p (Rock rp s _) 
@@ -76,6 +76,7 @@ simulateWorld timeStep (Play rocks (Ship shipPos shipV) bullets (Ufo ufoPos ufoV
       newShipPos :: PointInSpace
       newShipPos = restoreToScreen (shipPos .+ timeStep .* shipV)
 
+      -- Ufon tiedot lisätty
       updateUfo :: PointInSpace
       updateUfo = restoreToScreen (ufoPos .+ timeStep .* ufoV)
 
@@ -101,6 +102,7 @@ drawWorld GameOver
      . text 
      $ "Game Over!"
 
+     -- Ufoja lisätty
 drawWorld (Play rocks (Ship (x,y) (vx,vy)) bullets (Ufo (ufox,ufoy) (ufovx,ufovy)))
   = pictures [ship, asteroids,shots, ufo]
    where 
@@ -126,6 +128,7 @@ handleEvents (EventKey (MouseButton LeftButton) Down _ clickPos)
                         (negate 150 .* norm (shipPos .- clickPos)) 
                         0
      newVel    = shipVel .+ (50 .* norm (shipPos .- clickPos))
+     -- Ufon reagointi pelaajan liikkumiseen lisätty
      newUfoVel = ufoVel  .+ (50 .* norm (shipPos .+ clickPos))
 
 handleEvents _ w = w
@@ -165,4 +168,5 @@ main = play
          drawWorld 
          handleEvents
          simulateWorld
+
 
